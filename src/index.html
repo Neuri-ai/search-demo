@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/gh/Neuri-ai/web-components@1.0.0-beta-3/dist/web-components.bundle.min.js"
+    integrity="sha256-kg7kgO3k6BRFMSqdzPYeSm35nHKWGf7lLxF4zJ8Nqxo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="hidden" id="searched_results_display">
+    <header>
+      <nav>
+
+        <div>
+          <a href="index.html">
+            <img src="https://ik.imagekit.io/neuri/Logo_Neuri_QHKt5oUCp.svg?updatedAt=1662426210482" width="100"
+              alt="Neuri Logo">
+          </a>
+        </div>
+
+
+        <div class="after_search_container">
+          <input type="text" class="form-control search-field after-search-field"
+            placeholder="Search whatever you want..." id="after_search">
+        </div>
+
+
+      </nav>
+    </header>
+    <section class="wiki_results"></section>
+  </div>
+  <div class="wrapper">
+    <div class="search_body">
+      <img src="https://ik.imagekit.io/neuri/Logo_Neuri_QHKt5oUCp.svg?updatedAt=1662426210482" alt="Neuri Logo"
+        width="50%" class="search-engine-logo">
+      <div>
+        <input type="text" class="form-control search-field" placeholder="Search whatever you want..."
+          id="search_field">
+      </div>
+      <div class="search_buttons">
+
+        <a href="#" class="btn btn-primary" id="search">Search with Neuri</a>
+        <a href="https://en.wikipedia.org/wiki/Special:Random" class="btn btn-primary" id="random" target="_blank">i'm
+          feeling lucky</a>
+
+      </div>
+    </div>
+  </div>
+  <div class="bottom">
+    <mic-button lang="en" apikey="Kv0YTUKWhvUkmT77C2Ah_lYI_iOzsmqXgA" service="transcribe"
+      temperature="0.8"></mic-button>
+  </div>
+
+
+  <footer class="footer">
+    <div class="container-fluid text-center">
+      <div class="text-center d-block">
+        Copyright &copy;
+        <script>document.write(new Date().getFullYear());</script><a class="text-decoration-none"
+          href="https://neuri.ai"> Neuri</a>
+      </div>
+  </footer>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+    integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+  <script>
+
+    let hiddenSearch = document.querySelector('.search-field');
+    let homePage = document.querySelector('.wrapper');
+    let topNav = document.getElementById('searched_results_display');
+    let footer = document.querySelector('.footer');
+    let mic = document.querySelector('.bottom');
+
+    const ApiKey = 'AIzaSyApybNAog7h8xSuCgP46mfoBEY5brVMXK8';
+    const CxKey = '912126383dc3f4c47';
+
+
+    const FetchData = async (search) => {
+      await axios.get(` https://www.googleapis.com/customsearch/v1?key=${ApiKey}&cx=${CxKey}&q=${search}`).then(data => {
+        // hide home page and show top nav
+        homePage.classList.add('hidden');
+        topNav.classList.remove('hidden');
+        footer.style.position = 'relative';
+        footer.style.padding = '1em 1em 1em 1em;';
+        mic.style.bottom = '200px';
+
+        // clear previous results
+        document.querySelector('.wiki_results').innerHTML = '';
+
+        data.data.items.map((item) => {
+          let div = document.createElement('div');
+
+          div.classList.add('wiki_result');
+          div.innerHTML = `
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">${item.title}</h5>
+              <p class="card-text">${item.snippet}</p>
+              <a href="${item.link}" class="btn btn-primary" target="_blank">Read More</a>
+            </div>
+          </div>
+          `;
+          document.querySelector('.wiki_results').appendChild(div);
+        })
+      })
+    }
+
+    window.addEventListener('onSpeech', async (e) => {
+      let message = e.detail
+      // get h1 element
+      if (message.isFinal) {
+        document.getElementById('search_field').value = message.transcription;
+        hiddenSearch.value = message.transcription;
+
+        await FetchData(message.transcription);
+      }
+
+      if (message.transcription) {
+        document.getElementById('search_field').value = message.transcription;
+        hiddenSearch.value = message.transcription;
+      }
+    });
+  </script>
+</body>
+
+</html>
