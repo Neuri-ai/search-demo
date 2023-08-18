@@ -9,8 +9,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/gh/Neuri-ai/web-components@1.0.0-beta-3/dist/web-components.bundle.min.js"
-    integrity="sha256-kg7kgO3k6BRFMSqdzPYeSm35nHKWGf7lLxF4zJ8Nqxo=" crossorigin="anonymous"></script>
+  <script defer="defer" src="https://cdn.jsdelivr.net/gh/Neuri-ai/web-components@1.0.0-beta-5/dist/web-components.bundle.min.js" integrity="sha256-GOJ7Yl8vu/LgbtEN8uO5IWehsuf7t1LN2TgltCXAYT4=" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
@@ -54,8 +54,13 @@
     </div>
   </div>
   <div class="bottom">
-    <mic-button lang="en" apikey="F1qQ2d54a_adQzc02hYtjLsLWC7KLJmMSg" service="transcribe"
-      temperature="0.8"></mic-button>
+    <mic-button
+        apikey="API_KEY"
+        lang="en"
+        service="transcribe"
+        translate_to="es"
+        temperature="0.8"
+      ></mic-button>
   </div>
 
 
@@ -127,6 +132,12 @@
         document.getElementById('search_field').value = message.transcription;
         hiddenSearch.value = message.transcription;
       }
+    });
+  </script>
+  <script>
+    window.addEventListener('onSpeech', (e) => {
+      const message = e.detail;
+      console.log(message);
     });
   </script>
 </body>
